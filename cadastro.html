@@ -730,19 +730,19 @@
                     <span class="calc-label">Horas por dia dedicadas:</span>
                     <span class="calc-value" id="hoursDisplay">1 hora</span>
                 </div>
-                <input type="range" min="1" max="4" value="1" class="calc-slider" id="hoursSlider" oninput="updateCalc()">
+                <input type="range" min="0.5" max="4" step="0.5" value="1" class="calc-slider" id="hoursSlider" oninput="updateCalc()">
                 <div class="calc-row">
                     <span class="calc-label">Comentários por hora (média):</span>
                     <span class="calc-value">~20</span>
                 </div>
                 <div class="calc-row">
                     <span class="calc-label">Valor médio por comentário:</span>
-                    <span class="calc-value">R$ 3,50</span>
+                    <span class="calc-value">R$ 0,50</span>
                 </div>
                 <div class="calc-result">
                     <div class="calc-result-label">Ganho mensal estimado (30 dias)</div>
-                    <div class="calc-result-value" id="monthlyEarnings">R$ 2.100</div>
-                    <div class="calc-result-sub">*Baseado em 20 comentários/hora a R$3,50 médio</div>
+                    <div class="calc-result-value" id="monthlyEarnings">R$ 300,00</div>
+                    <div class="calc-result-sub">*Baseado em 20 comentários/hora a R$0,50 médio</div>
                 </div>
             </div>
         </div>
@@ -759,7 +759,7 @@
                         <div class="pix-avatar" style="background: linear-gradient(135deg,#f093fb,#f5576c);">AF</div>
                         <div><div class="pix-user-name">Ana F.</div><div class="pix-user-loc">São Paulo, SP</div></div>
                     </div>
-                    <div class="pix-amount">R$ 347,00</div>
+                    <div class="pix-amount">R$ 42,50</div>
                     <div class="pix-label">Saque semanal</div>
                 </div>
                 <div class="pix-card">
@@ -767,7 +767,7 @@
                         <div class="pix-avatar" style="background: linear-gradient(135deg,#4facfe,#00f2fe);">MS</div>
                         <div><div class="pix-user-name">Marcos S.</div><div class="pix-user-loc">Rio de Janeiro, RJ</div></div>
                     </div>
-                    <div class="pix-amount">R$ 1.280,00</div>
+                    <div class="pix-amount">R$ 135,00</div>
                     <div class="pix-label">Saque mensal</div>
                 </div>
                 <div class="pix-card">
@@ -775,7 +775,7 @@
                         <div class="pix-avatar" style="background: linear-gradient(135deg,#a18cd1,#fbc2eb);">PO</div>
                         <div><div class="pix-user-name">Patrícia O.</div><div class="pix-user-loc">Belo Horizonte, MG</div></div>
                     </div>
-                    <div class="pix-amount">R$ 89,50</div>
+                    <div class="pix-amount">R$ 22,00</div>
                     <div class="pix-label">Primeiro saque</div>
                 </div>
                 <div class="pix-card">
@@ -783,7 +783,7 @@
                         <div class="pix-avatar" style="background: linear-gradient(135deg,#ffecd2,#fcb69f);">RC</div>
                         <div><div class="pix-user-name">Roberto C.</div><div class="pix-user-loc">Curitiba, PR</div></div>
                     </div>
-                    <div class="pix-amount">R$ 2.140,00</div>
+                    <div class="pix-amount">R$ 180,00</div>
                     <div class="pix-label">Acumulado 30 dias</div>
                 </div>
                 <div class="pix-card">
@@ -791,7 +791,7 @@
                         <div class="pix-avatar" style="background: linear-gradient(135deg,#84fab0,#8fd3f4);">JL</div>
                         <div><div class="pix-user-name">Juliana L.</div><div class="pix-user-loc">Recife, PE</div></div>
                     </div>
-                    <div class="pix-amount">R$ 560,00</div>
+                    <div class="pix-amount">R$ 65,00</div>
                     <div class="pix-label">Saque quinzenal</div>
                 </div>
                 <div class="pix-card">
@@ -799,7 +799,7 @@
                         <div class="pix-avatar" style="background: linear-gradient(135deg,#fbc2eb,#a6c1ee);">DM</div>
                         <div><div class="pix-user-name">Diego M.</div><div class="pix-user-loc">Fortaleza, CE</div></div>
                     </div>
-                    <div class="pix-amount">R$ 178,00</div>
+                    <div class="pix-amount">R$ 31,50</div>
                     <div class="pix-label">Saque semanal</div>
                 </div>
             </div>
@@ -1063,13 +1063,14 @@ Qualquer dúvida, é só mandar mensagem aqui! 💬`;
 
         // Calculator
         function updateCalc() {
-            const hours = document.getElementById('hoursSlider').value;
+            const hours = parseFloat(document.getElementById('hoursSlider').value);
             const commentsPerHour = 20;
-            const avgValue = 2.75;
+            const avgValue = 0.50;
             const monthly = hours * commentsPerHour * avgValue * 30;
 
-            document.getElementById('hoursDisplay').textContent = hours + (hours == 1 ? ' hora' : ' horas');
-            document.getElementById('monthlyEarnings').textContent = 'R$ ' + monthly.toLocaleString('pt-BR');
+            let displayHours = hours === 0.5 ? '30 minutos' : (hours === 1 ? '1 hora' : hours + ' horas');
+            document.getElementById('hoursDisplay').textContent = displayHours;
+            document.getElementById('monthlyEarnings').textContent = 'R$ ' + monthly.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         }
 
         // FAQ Accordion
