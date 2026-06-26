@@ -305,64 +305,33 @@
     const PER_PAGE = 25;
     let selectedLeads = new Set();
 
-    function getLeads() {
-        let leads = JSON.parse(localStorage.getItem('cl_leads') || '[]');
-        
-        // Auto-recover lead if empty (due to domain change or cache clear)
-        if (leads.length === 0) {
-            leads.push(
-                {
-                    id: 'rec_' + Date.now(),
-                    nome: 'Mariane F Tenorio',
-                    email: 'marianeftenorio@gmail.com',
-                    whatsapp: '(82) 92001-2084',
-                    data: new Date().toISOString(),
-                    data_br: new Date().toLocaleString('pt-BR'),
-                    pagina: '/cadastro',
-                    referrer: 'direto',
-                    dispositivo: 'desktop',
-                    navegador: 'Chrome',
-                    utm_source: 'direto',
-                    status: 'novo'
-                },
-                {
-                    id: 'rec_' + (Date.now() + 1),
-                    nome: 'Mateus Silva',
-                    email: 'mateus.silva@exemplo.com',
-                    whatsapp: '(11) 98765-4321',
-                    data: new Date(Date.now() - 3600000).toISOString(),
-                    data_br: new Date(Date.now() - 3600000).toLocaleString('pt-BR'),
-                    pagina: '/cadastro',
-                    referrer: 'facebook',
-                    dispositivo: 'mobile',
-                    navegador: 'Safari',
-                    utm_source: 'facebook',
-                    status: 'novo'
-                },
-                {
-                    id: 'rec_' + (Date.now() + 2),
-                    nome: 'Lucas Oliveira',
-                    email: 'lucas.oliveira88@exemplo.com',
-                    whatsapp: '(21) 99876-5432',
-                    data: new Date(Date.now() - 7200000).toISOString(),
-                    data_br: new Date(Date.now() - 7200000).toLocaleString('pt-BR'),
-                    pagina: '/cadastro',
-                    referrer: 'google',
-                    dispositivo: 'desktop',
-                    navegador: 'Chrome',
-                    utm_source: 'google',
-                    status: 'contatado'
-                }
-            );
-            localStorage.setItem('cl_leads', JSON.stringify(leads));
-            localStorage.setItem('cl_stats', JSON.stringify({ total: 3, today: 3, lastDate: new Date().toISOString().split('T')[0] }));
+    const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxqDBgbvMQTEy4yL-MT4xAojnaYcVerDM7XCxBLPQLDFRsP4ta0LKHQLq5LRbhdnlQQ/exec';
+    let globalLeads = [];
+
+    async function getLeadsFromSheet() {
+        try {
+            document.getElementById('leadsTable').innerHTML = '<tr><td colspan="8" style="text-align:center; padding:40px;">⏳ Carregando leads da planilha...</td></tr>';
+            const res = await fetch(WEBHOOK_URL);
+            const data = await res.json();
+            return data.reverse(); // Os mais novos primeiro
+        } catch (e) {
+            console.error('Erro ao buscar planilha', e);
+            return [];
         }
-        
-        return leads;
+    }
+
+    async function init() {
+        globalLeads = await getLeadsFromSheet();
+        renderTable();
+    }
+
+    function getLeads() {
+        return globalLeads;
     }
 
     function saveLeads(leads) {
-        localStorage.setItem('cl_leads', JSON.stringify(leads));
+        // Agora salva apenas no cache da sessão pra uso imediato
+        globalLeads = leads;
     }
 
     function filterLeads(leads) {
@@ -632,7 +601,7 @@
     });
 
     // Init
-    renderTable();
+    init();
 </script>
 </body>
 </html>
