@@ -340,15 +340,19 @@
 
         return leads.filter(l => {
             // Search
-            if (search && !l.nome?.toLowerCase().includes(search) && !l.email?.toLowerCase().includes(search) && !l.whatsapp?.includes(search)) {
+            const nomeStr = String(l.nome || '').toLowerCase();
+            const emailStr = String(l.email || '').toLowerCase();
+            const wappStr = String(l.whatsapp || '');
+            
+            if (search && !nomeStr.includes(search) && !emailStr.includes(search) && !wappStr.includes(search)) {
                 return false;
             }
             // Filters
             if (currentFilter === 'novo') return l.status === 'novo';
             if (currentFilter === 'contatado') return l.status === 'contatado';
-            if (currentFilter === 'hoje') return l.data?.startsWith(today);
+            if (currentFilter === 'hoje') return String(l.data || '').startsWith(today) || String(l.data_br || '').includes(new Date().toLocaleDateString('pt-BR'));
             if (currentFilter === 'mobile') return l.dispositivo === 'mobile';
-            if (currentFilter === 'meta') return l.fbclid || l.utm_source?.includes('facebook') || l.utm_source?.includes('meta') || l.utm_source?.includes('ig');
+            if (currentFilter === 'meta') return l.fbclid || String(l.utm_source || '').includes('facebook') || String(l.utm_source || '').includes('meta') || String(l.utm_source || '').includes('ig');
             return true;
         });
     }
@@ -383,7 +387,8 @@
             const sourceLabel = getSourceLabel(l);
             const deviceBadge = l.dispositivo === 'mobile' ? '<span class="badge badge-mobile">📱 Mobile</span>' : '<span class="badge badge-desktop">💻 Desktop</span>';
             const statusBadge = l.status === 'contatado' ? '<span class="badge badge-contacted">Contatado</span>' : '<span class="badge badge-new">Novo</span>';
-            const cleanPhone = l.whatsapp?.replace(/\D/g, '') || '';
+            const wappStr = String(l.whatsapp || '');
+            const cleanPhone = wappStr.replace(/\D/g, '');
             const waLink = cleanPhone ? `https://wa.me/55${cleanPhone.replace(/^55/,'')}` : '#';
 
             return `
@@ -427,10 +432,10 @@
     }
 
     function updateStats(leads) {
-        const today = new Date().toISOString().split('T')[0];
-        const todayLeads = leads.filter(l => l.data?.startsWith(today));
+        const todayStr = new Date().toLocaleDateString('pt-BR');
+        const todayLeads = leads.filter(l => String(l.data_br || '').includes(todayStr) || String(l.data || '').startsWith(new Date().toISOString().split('T')[0]));
         const mobileLeads = leads.filter(l => l.dispositivo === 'mobile');
-        const metaLeads = leads.filter(l => l.fbclid || l.utm_source?.includes('facebook') || l.utm_source?.includes('meta'));
+        const metaLeads = leads.filter(l => l.fbclid || String(l.utm_source || '').includes('facebook') || String(l.utm_source || '').includes('meta'));
         const newLeads = leads.filter(l => l.status === 'novo');
 
         document.getElementById('statTotal').textContent = leads.length;
