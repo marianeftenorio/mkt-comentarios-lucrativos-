@@ -640,7 +640,20 @@
                         CRIAR MINHA CONTA GRÁTIS →
                     </button>
                 </form>
-                <div class="signup-trust">
+
+                <!-- MENSAGEM DE SUCESSO (Oculta por padrão) -->
+                <div id="successMessage" style="display: none; text-align: center; padding: 30px 10px;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+                    <h3 style="font-size: 24px; font-weight: 800; color: #10b981; margin-bottom: 12px;">Você está quase lá!</h3>
+                    <p style="font-size: 15px; color: #94a3b8; line-height: 1.6; margin-bottom: 24px;">
+                        Seus dados foram salvos com sucesso.<br>
+                        Você está sendo redirecionado de forma segura para o site oficial do <strong>Comentários Lucrativos</strong>...
+                    </p>
+                    <div style="width: 40px; height: 40px; border: 4px solid rgba(16,185,129,0.2); border-top-color: #10b981; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+                </div>
+
+                <div class="signup-trust" id="signupTrust">
                     <span>🔒 Dados protegidos</span>
                     <span>✅ 100% gratuito</span>
                     <span>💰 Saque via PIX</span>
@@ -1103,10 +1116,10 @@ Qualquer dúvida, é só mandar mensagem aqui! 💬`;
                 status: 'novo'
             };
 
-            // 1. Salva localmente
+            // 1. Salva localmente com segurança ANTES do redirect
             saveLeadLocal(lead);
 
-            // 2. Envia para webhook (Google Sheets / Zapier / Make)
+            // 2. Envia para webhook
             sendToWebhook(lead);
 
             // 3. Envia mensagem WhatsApp
@@ -1115,13 +1128,19 @@ Qualquer dúvida, é só mandar mensagem aqui! 💬`;
             // 4. Dispara pixels de conversão
             firePixelEvent(lead);
 
-            // 5. Feedback visual + redirect
+            // 5. Esconde o form e mostra mensagem de sucesso
+            document.getElementById('signupForm').style.display = 'none';
+            const trust = document.getElementById('signupTrust');
+            if(trust) trust.style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+
+            // Faz scroll pra cima caso esteja no mobile para a pessoa ler a mensagem
+            window.scrollTo({ top: document.getElementById('successMessage').offsetTop - 100, behavior: 'smooth' });
+
+            // 6. Aguarda 3.5 segundos para a pessoa ler e salvar no localStorage e então redireciona
             setTimeout(() => {
-                btn.textContent = '✅ CADASTRO REALIZADO! REDIRECIONANDO...';
-                setTimeout(() => {
-                    window.location.href = 'https://www.comentarioslucrativos.com/dashboard';
-                }, 1200);
-            }, 800);
+                window.location.href = 'https://www.comentarioslucrativos.com/dashboard';
+            }, 3500);
         }
 
         // Live counter animation
