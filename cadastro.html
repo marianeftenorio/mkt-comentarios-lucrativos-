@@ -931,7 +931,7 @@
 
         // Cole aqui a URL do seu webhook (Google Sheets, Zapier, Make, etc.)
         // Deixe vazio ('') para armazenar apenas localmente
-        const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxqDBgbvMQTEy4yL-MT4xAojnaYcVerDM7XCxBLPQLDFRsP4ta0LKHQLq5LRbhdnlQQ/exec';
+        const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycby3ErZEJMf7HbS8eKrD8bt6Atszb9l5JzBx2XYM8LGVQt-4DnV8_KbatFHf-wzCLPCs/exec';
 
         // Cole aqui o link da API do WhatsApp (ex: Evolution API, Z-API, etc.)
         // Deixe vazio ('') para não enviar mensagem automática
@@ -1121,8 +1121,18 @@ Qualquer dúvida, é só mandar mensagem aqui! 💬`;
             // 1. Salva localmente com segurança ANTES do redirect
             saveLeadLocal(lead);
 
-            // 2. Envia para webhook
-            sendToWebhook(lead);
+            // 2. Envia para webhook (Google Sheets)
+            if (WEBHOOK_URL) {
+                try {
+                    fetch(WEBHOOK_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(lead),
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                    });
+                } catch (err) {
+                    console.warn('Webhook error:', err);
+                }
+            }
 
             // 3. Envia mensagem WhatsApp
             sendWhatsAppWelcome(phone);
