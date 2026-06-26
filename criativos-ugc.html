@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco de Criativos UGC — Comentários Lucrativos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a0e17;
+            --card: #111827;
+            --border: rgba(255,255,255,0.08);
+            --text: #f1f5f9;
+            --muted: #64748b;
+            --green: #10b981;
+            --blue: #3b82f6;
+            --purple: #8b5cf6;
+            --gold: #f59e0b;
+            --red: #ef4444;
+            --pink: #ec4899;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+        .header { padding: 48px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 48px; }
+        .header h1 { font-size: 36px; font-weight: 900; letter-spacing: -1px; margin-bottom: 8px; }
+        .header p { color: var(--muted); font-size: 16px; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-green { background: rgba(16,185,129,0.15); color: var(--green); }
+        .badge-blue { background: rgba(59,130,246,0.15); color: var(--blue); }
+        .badge-purple { background: rgba(139,92,246,0.15); color: var(--purple); }
+        .badge-gold { background: rgba(245,158,11,0.15); color: var(--gold); }
+        .badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
+        .badge-pink { background: rgba(236,72,153,0.15); color: var(--pink); }
+
+        .creative-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 48px; }
+        .creative-card {
+            background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+            overflow: hidden; transition: all 0.3s;
+        }
+        .creative-card:hover { transform: translateY(-4px); border-color: rgba(16,185,129,0.3); }
+        .creative-header {
+            padding: 16px 20px; background: rgba(255,255,255,0.03);
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+        .creative-number { font-size: 13px; font-weight: 800; color: var(--green); }
+        .creative-format { font-size: 11px; color: var(--muted); }
+        .creative-body { padding: 24px 20px; }
+        .creative-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+        .creative-persona { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+
+        .hook-box {
+            background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.15);
+            border-radius: 10px; padding: 16px; margin-bottom: 16px;
+        }
+        .hook-label { font-size: 10px; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+        .hook-text { font-size: 14px; font-style: italic; color: #94a3b8; line-height: 1.7; }
+
+        .copy-box {
+            background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.12);
+            border-radius: 10px; padding: 16px; margin-bottom: 12px;
+        }
+        .copy-label { font-size: 10px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+        .copy-text { font-size: 13px; color: #94a3b8; line-height: 1.7; }
+
+        .specs-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+        .spec-tag { font-size: 11px; padding: 4px 10px; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+
+        .roteiro-box {
+            background: rgba(139,92,246,0.06); border: 1px solid rgba(139,92,246,0.12);
+            border-radius: 10px; padding: 16px; margin-bottom: 12px;
+        }
+        .roteiro-label { font-size: 10px; font-weight: 700; color: var(--purple); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .roteiro-text { font-size: 13px; color: #94a3b8; line-height: 1.8; }
+        .roteiro-text .sec { color: var(--gold); font-weight: 600; font-size: 11px; display: inline-block; margin-right: 6px; }
+
+        .section-divider { border-top: 1px solid var(--border); padding-top: 48px; margin-top: 48px; }
+        .section-title { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+        .section-subtitle { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+
+        .copy-bank { margin-bottom: 48px; }
+        .copy-bank-item {
+            background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+            padding: 20px; margin-bottom: 12px;
+        }
+        .copy-bank-label { font-size: 11px; font-weight: 700; color: var(--gold); margin-bottom: 6px; }
+        .copy-bank-text { font-size: 14px; line-height: 1.7; }
+        .copy-bank-platform { font-size: 11px; color: var(--muted); margin-top: 8px; }
+
+        .print-btn {
+            display: block; max-width: 300px; margin: 48px auto;
+            padding: 14px 32px; background: var(--card); border: 1px solid var(--border);
+            color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+            border-radius: 10px; cursor: pointer; text-align: center; transition: all 0.2s;
+        }
+        .print-btn:hover { background: rgba(255,255,255,0.06); border-color: var(--green); }
+
+        @media print {
+            body { background: white; color: black; }
+            .creative-card { break-inside: avoid; border: 1px solid #ddd; }
+            .print-btn { display: none; }
+        }
+        @media (max-width: 768px) {
+            .creative-grid { grid-template-columns: 1fr; }
+            .header h1 { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 Banco de Criativos UGC</h1>
+            <p>10 conceitos completos com copy pronta, roteiro e especificações técnicas — Comentários Lucrativos</p>
+        </div>
+
+        <!-- CATEGORIA 1: PRINT PIX -->
+        <h2 class="section-title">📸 Categoria 1 — Print de PIX</h2>
+        <p class="section-subtitle">Top performers no nicho de renda extra. Prova visual = conversão alta.</p>
+
+        <div class="creative-grid">
+            <!-- CRIATIVO 1 -->
+            <div class="creative-card">
+                <div class="creative-header">
+                    <span class="creative-number">#01</span>
+                    <span class="badge badge-green">Top Performer</span>
+                    <span class="creative-format">📸 Imagem estática</span>
+                </div>
+                <div class="creative-body">
+                    <div class="creative-title">Print PIX + "E é Grátis"</div>
+                    <div class="creative-persona">Público: Mulheres 25-50 • Facebook/Instagram</div>
+
+                    <div class="hook-box">
+                        <div class="hook-label">💬 Copy do Anúncio</div>
+                        <div class="hook-text">
+                            "Recebi R$87,50 só por comentar em blogs. E o app é DE GRAÇA. Não paguei nada pra entrar. 🤯<br><br>
+                            Se eu posso, qualquer pessoa pode. Link no botão 👇"
+                        </div>
+                    </div>
+
+                    <div class="copy-box">
+                        <div class="copy-label">📐 Especificação do Criativo</div>
+                        <div class="copy-text">
+                            • Imagem: Print de notificação PIX estilo Nubank (fundo escuro)<br>
+                            • Valor: "R$ 87,50 — Comentários Lucrativos"<br>
+                            • Overlay: Badge verde "100% GRÁTIS" no canto superior<br>
+                            • Texto no rodapé: "Cadastro gratuito • Saque via PIX"<br>
+                            • Proporção: 1:1 (Feed) + 9:16 (Stories/Reels)
+                        </div>
+                    </div>
+                    <div class="specs-row">
+                        <span class="spec-tag">Feed + Stories</span>
+                        <span class="spec-tag">1:1 e 9:16</span>
+                        <span class="spec-tag">Meta Ads</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CRIATIVO 2 -->
+            <div class="creative-card">
+                <div class="creative-header">
+                    <span class="creative-number">#02</span>
+                    <span class="badge badge-blue">Carrossel</span>
+                    <span class="creative-format">📱 Carrossel 5 cards</span>
+                </div>
+                <div class="creative-body">
+                    <div class="creative-title">Carrossel: "De R$0 a R$347 em 7 Dias"</div>
+                    <div class="creative-persona">Público: Broad 25-50 • Facebook/Instagram</div>
+
+                    <div class="hook-box">
+                        <div class="hook-label">💬 Copy do Anúncio</div>
+                        <div class="hook-text">
+                            "De R$0 a R$347 em 7 dias. Deslize pra ver como eu fiz. 👉<br><br>
+                            App gratuito. Sem investimento. Saque PIX. Link no botão ↓"
+                        </div>
+                    </div>
+
+                    <div class="copy-box">
+                        <div class="copy-label">📐 Cards do Carrossel</div>
+                        <div class="copy-text">
+                            <strong>Card 1:</strong> "Descobri um app GRÁTIS que paga por comentários" (texto clean, fundo escuro)<br>
+                            <strong>Card 2:</strong> Print do painel de missões (screenshot)<br>
+                            <strong>Card 3:</strong> Print de saque PIX R$87,50<br>
+                            <strong>Card 4:</strong> Print de saque PIX R$142,00<br>
+                            <strong>Card 5:</strong> "Total: R$347 em 7 dias | Cadastro GRÁTIS 👇" (CTA)
+                        </div>
+                    </div>
+                    <div class="specs-row">
+                        <span class="spec-tag">Carrossel</span>
+                        <span class="spec-tag">1:1</span>
+                        <span class="spec-tag">Meta Ads</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CATEGORIA 2: UGC VÍDEO -->
+        <div class="section-divider"></div>
+        <h2 class="section-title">🎥 Categoria 2 — Vídeo UGC (Depoimento)</h2>
+        <p class="section-subtitle">Formato mais confiável. Parecer orgânico, NÃO publicitário. Câmera frontal, iluminação natural.</p>
+
+        <div class="creative-grid">
+            <!-- CRIATIVO 3 -->
+            <div class="creative-card">
+                <div class="creative-header">
+                    <span class="creative-number">#03</span>
+                    <span class="badge badge-pink">UGC Feminino</span>
+                    <span class="creative-format">🎥 Vídeo 30s</span>
+                </div>
+                <div class="creative-body">
+                    <div class="creative-title">"Gente, Achei Um App Que Paga DE GRAÇA"</div>
+                    <div class="creative-persona">Atriz: Mulher 35-45 anos • Tom informal, empolgada • Câmera frontal</div>
+
+                    <div class="roteiro-box">
+                        <div class="roteiro-label">🎬 Roteiro Completo</div>
+                        <div class="roteiro-text">
+                            <span class="sec">0-3s:</span> [Expressão de surpresa olhando pro celular] "Gente, vocês NÃO vão acreditar no que eu descobri..."<br><br>
+                            <span class="sec">3-10s:</span> "Achei um app que paga pra gente comentar em blog. E o melhor? É DE GRAÇA. Não paguei nenhum centavo pra entrar."<br><br>
+                            <span class="sec">10-20s:</span> "Olha aqui ó..." [mostra tela do celular com saque PIX] "R$230 que eu saquei essa semana. Só comentando em site."<br><br>
+                            <span class="sec">20-27s:</span> "Se você tá precisando de uma renda extra e não quer gastar nada, esse é o melhor que eu já achei. Juro."<br><br>
+                            <span class="sec">27-30s:</span> "Link tá aqui embaixo. É gratuito, vai lá!" [aponta pra baixo]
+                        </div>
+                    </div>
+
+                    <div class="hook-box">
+                        <div class="hook-label">💬 Copy do Anúncio</div>
+                        <div class="hook-text">
+                            "Eu tava igual você, cansada de app que cobra e não paga. 😤<br>
+                            Esse é GRATUITO de verdade. Já saquei R$230 essa semana. 💰<br>
+                            Cadastro no link 👇"
+                        </div>
+                    </div>
+                    <div class="specs-row">
+                        <span class="spec-tag">9:16 (Reels/Stories)</span>
+                        <span class="spec-tag">30s</span>
+                        <span class="spec-tag">Meta + TikTok</span>
+                        <span class="spec-tag">Legenda na tela</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CRIATIVO 4 -->
+            <div class="creative-card">
+                <div class="creative-header">
+                    <span class="creative-number">#04</span>
+                    <span class="badge badge-blue">UGC Masculino</span>
+                    <span class="creative-format">🎥 Vídeo 30s</span>
+                </div>
+                <div class="creative-body">
+                    <div class="creative-title">"No Começo Achei Que Era Golpe"</div>
+                    <div class="creative-persona">Ator: Homem 35-45 anos • Tom sério/credível • Câmera frontal</div>
+
+                    <div class="roteiro-box">
+                        <div class="roteiro-label">🎬 Roteiro Completo</div>
+                        <div class="roteiro-text">
+                            <span class="sec">0-3s:</span> [Olhando sério pra câmera] "Quando me falaram de um app que paga por comentário, eu falei: é golpe."<br><br>
+                            <span class="sec">3-10s:</span> "Mas esse aqui é GRATUITO. Não pedi cartão, não pedi PIX, não pedi nada. Então pensei: não perco nada testando."<br><br>
+                            <span class="sec">10-20s:</span> "Fiz 5 comentários no primeiro dia. Sacou R$22 pelo PIX na hora." [mostra print] "Não é golpe. É trabalho."<br><br>
+                            <span class="sec">20-27s:</span> "Hoje faço R$80 a R$120 por dia. Sem investir um centavo."<br><br>
+                            <span class="sec">27-30s:</span> "Se tá precisando de grana, testa. É grátis. Link aí embaixo."
+                        </div>
+                    </div>
+
+                    <div class="hook-box">
+                        <div class="hook-label">💬 Copy do Anúncio</div>
+                        <div class="hook-text">
+                            "Achei que era golpe. Mas é grátis, então testei. 🤔<br>
+                            Resultado: R$680 no primeiro mês. Sem investir NADA. 💰<br>
+                            Cadastro gratuito no link 👇"
+                        </div>
+                    </div>
+                    <div class="specs-row">
+                        <span class="spec-tag">9:16 (Reels/Stories)</span>
+                        <span class="spec-tag">30s</span>
+                        <span class="spec-tag">Meta + TikTok</span>
+                        <span class="spec-tag">Legenda na tela</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CRIATIVO 5 -->
+            <div class="creative-card">
+                <div class="creative-header">
+                    <span class="creative-number">#05</span>
+                    <span class="badge badge-green">UGC Jovem</span>
+                    <span class="creative-format">🎥 Vídeo 30s</span>
+                </div>
+                <div class="creative-body">
+                    <div class="creative-title">"Minha Renda Extra Pagando Almoço"</div>
+                    <div class="creative-persona">Ator: Jovem 18-25 anos • Tom animado/Gen Z • Câmera frontal</div>
+
+                    <div class="roteiro-box">
+                        <div class="roteiro-label">🎬 Roteiro Completo</div>
+                        <div class="roteiro-text">
+                            <span class="sec">0-3s:</span> "POV: você descobre que dá pra ganhar dinheiro GRÁTIS pelo celular comentando em blog" [olhar de choque]<br><br>
+                            <span class="sec">3-10s:</span> "Sério, eu uso entre as aulas da faculdade. 30 minutos, 10 comentários, R$40 no bolso."<br><br>
+                            <span class="sec">10-18s:</span> [Mostra celular] "Olha meu extrato: R$560 esse mês. Paga meu almoço, meu Uber e ainda sobra."<br><br>
+                            <span class="sec">18-25s:</span> "E o mais importante: NÃO GASTEI NADA. App é 100% gratuito. Diferente de todos os outros."<br><br>
+                            <span class="sec">25-30s:</span> "Link na bio. Cadastra e começa hoje. É grátis, confia." [sorriso]
+                        </div>
+                    </div>
+
+                    <div class="hook-box">
+                        <div class="hook-label">💬 Copy do Anúncio</div>
+                        <div class="hook-text">
+                            "R$560/mês. Pelo celular. Entre as aulas. GRÁTIS. 📱💰<br>
+                            Não é curso, não é mentoria, não é pirâmide.<br>
+                            É comentar em blog e receber PIX. Link 👇"
+                        </div>
+                    </div>
+                    <div class="specs-row">
+                        <span class="spec-tag">9:16 (TikTok)</span>
+                        <span class="spec-tag">30s</span>
+                        <span class="spec-tag">TikTok + Reels</span>
+                        <span class="spec-tag">Texto na tela rápido</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CRIATIVO 6 -->
+            <div class="creative-card">
+                <div class="creative-header">
+                    <span class="creative-number">#06</span>
+                    <span class="badge badge-gold">UGC Aposentada</span>
+                    <span class="creative-format">🎥 Vídeo 35s</span>
+                </div>
+                <div class="creative-body">
+                    <div class="creative-title">"Minha Neta Me Ensinou"</div>
+                    <div class="creative-persona">Atriz: Mulher 55-65 anos • Tom emocional/sincero • Câmera frontal</div>
+
+                    <div class="roteiro-box">
+                        <div class="roteiro-label">🎬 Roteiro Completo</div>
+                        <div class="roteiro-text">
+                            <span class="sec">0-5s:</span> "Eu tenho 63 anos e nunca pensei que fosse ganhar dinheiro pela internet."<br><br>
+                            <span class="sec">5-15s:</span> "Minha neta me mostrou esse aplicativo gratuito. Ela falou: 'vó, é só comentar em site que eles pagam'. Eu achei loucura, mas como não precisava pagar nada, resolvi testar."<br><br>
+                            <span class="sec">15-25s:</span> "Gente, eu já comprei remédio, fiz compra do mês... tudo com dinheiro dos comentários." [voz embargada]<br><br>
+                            <span class="sec">25-30s:</span> "Se uma senhora de 63 anos consegue, imagine você. E é de graça, não precisa gastar nenhum centavo."<br><br>
+                            <span class="sec">30-35s:</span> "O link tá aí embaixo. Vai, cadastra. Sua vida pode mudar." [sorriso doce]
+                        </div>
+                    </div>
+
+                    <div class="hook-box">
+                        <div class="hook-label">💬 Copy do Anúncio</div>
+                        <div class="hook-text">
+                            "Se uma aposentada de 63 anos consegue, você também consegue. 👵💰<br>
+                            App GRATUITO que paga por comentários. Sem enrolação.<br>
+                            Ela já sacou mais de R$1.400. Link 👇"
+                        </div>
+                    </div>
+                    <div class="specs-row">
+                        <span class="spec-tag">9:16 (Reels/Stories)</span>
+                        <span class="spec-tag">35s</span>
+                        <span class="spec-tag">Meta Ads</span>
+                        <span class="spec-tag">Emocional</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CATEGORIA 3: DEMONSTRAÇÃO -->
+        <div class="section-divider"></div>
+        <h2 class="section-title">📱 Categoria 3 — Demonstração do App</h2>
+        <p class="section-subtitle">Mostra o processo real: cadastro → missão → saque. Elimina objeções mostrando a plataforma.</p>
+
+        <div class="creative-grid">
+            <!-- CRIATIVO 7 -->
+            <div class="creative-card">
+                <div class="creative-header">
+                    <span class="creative-number">#07</span>
+                    <span class="badge badge-purple">Screen Recording</span>
+                    <span class="creative-format">📱 Vídeo 30s</span>
+                </div>
+                <div class="creative-body">
+                    <div class="creative-title">"Cadastrei e Já Ganhei — Em Tempo Real"</div>
+                    <div class="creative-persona">Formato: Screen recording + narração • Público amplo</div>
+
+                    <div class="roteiro-box">
+                        <div class="roteiro-label">🎬 Roteiro Completo</div>
+                        <div class="roteiro-text">
+                            <span class="sec">0-3s:</span> [Texto na tela] "Cadastrei grátis e já ganhei. Olha:" <br><br>
+                            <span class="sec">3-10s:</span> [Screen recording] Abre site → Clica "Cadastrar" → Preenche nome/email (blur) → Confirma<br><br>
+                            <span class="sec">10-18s:</span> [Screen recording] Entra no painel → Vê missões disponíveis → Clica uma → Lê artigo → Escreve comentário → Envia<br><br>
+                            <span class="sec">18-25s:</span> [Screen recording] Saldo atualiza → Clica "Sacar" → Notificação PIX aparece<br><br>
+                            <span class="sec">25-30s:</span> [Texto overlay] "R$22 em 15 minutos. Grátis. Link abaixo 👇"
+                        </div>
+                    </div>
+
+                    <div class="hook-box">
+                        <div class="hook-label">💬 Copy do Anúncio</div>
+                        <div class="hook-text">
+                            "Fiz R$22 em 15 minutos. Tudo gravado. Assiste: 📱<br>
+                            Cadastro gratuito → Comenta → Saque PIX. Simples assim.<br>
+                            Link no botão 👇"
+                        </div>
+                    </div>
+                    <div class="specs-row">
+                        <span class="spec-tag">9:16</span>
+                        <span class="spec-tag">30s</span>
+                        <span class="spec-tag">Meta + TikTok</span>
+                        <span class="spec-tag">Screen recording</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CRIATIVO 8 -->
+            <div class="creative-card">
+                <div class="creative-header">
+                    <span class="creative-number">#08</span>
+                    <span class="badge badge-gold">Dia na Vida</span>
+                    <span class="creative-format">🎥 Vídeo 45s</span>
+                </div>
+                <div class="creative-body">
+                    <div class="creative-title">"Um Dia Ganhando Dinheiro com Comentários"</div>
+                    <div class="creative-persona">Formato: Lifestyle + screen recording • Público amplo</div>
+
+                    <div class="roteiro-box">
+                        <div class="roteiro-label">🎬 Roteiro Completo</div>
+                        <div class="roteiro-text">
+                            <span class="sec">0-5s:</span> [Pessoa acordando, café] "Minha rotina de renda extra: 1 hora por dia, R$80-120 no bolso."<br><br>
+                            <span class="sec">5-15s:</span> [Sentada no sofá com celular] "Abro o app grátis, escolho 3-4 missões..." [mostra tela]<br><br>
+                            <span class="sec">15-25s:</span> [Lendo artigo] "Leio o artigo, escrevo um comentário sincero..." [mostra digitando]<br><br>
+                            <span class="sec">25-35s:</span> [Mais tarde] "Fim do dia: 20 comentários, R$87 sacados via PIX." [mostra notificação]<br><br>
+                            <span class="sec">35-45s:</span> [Sorrindo] "E o melhor: nunca paguei nada pra usar. É 100% gratuito. Link na bio."
+                        </div>
+                    </div>
+
+                    <div class="hook-box">
+                        <div class="hook-label">💬 Copy do Anúncio</div>
+                        <div class="hook-text">
+                            "Minha rotina de renda extra: 1h/dia, R$80-120. ☕📱<br>
+                            Sem investimento. Sem experiência. App 100% gratuito.<br>
+                            Assiste o vídeo e vê se serve pra você 👇"
+                        </div>
+                    </div>
+                    <div class="specs-row">
+                        <span class="spec-tag">9:16</span>
+                        <span class="spec-tag">45s</span>
+                        <span class="spec-tag">TikTok + Reels</span>
+                        <span class="spec-tag">Lifestyle</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CATEGORIA 4: CURIOSIDADE / TEXTO -->
+        <div class="section-divider"></div>
+        <h2 class="section-title">📝 Categoria 4 — Curiosidade / Texto</h2>
+        <p class="section-subtitle">Para tráfego pago de curiosidade pura. CTR alto, escala rápida.</p>
+
+        <div class="creative-grid">
+            <!-- CRIATIVO 9 -->
+            <div class="creative-card">
+                <div class="creative-header">
+                    <span class="creative-number">#09</span>
+                    <span class="badge badge-red">Alto CTR</span>
+                    <span class="creative-format">📸 Imagem estática</span>
+                </div>
+                <div class="creative-body">
+                    <div class="creative-title">"Empresas Pagam R$5 por COMENTÁRIO"</div>
+                    <div class="creative-persona">Formato: Texto grande em fundo escuro • Público broad</div>
+
+                    <div class="copy-box">
+                        <div class="copy-label">📐 Design do Criativo</div>
+                        <div class="copy-text">
+                            • Fundo: #0a0e17 (escuro clean)<br>
+                            • Texto principal (branco, bold, 48px): "Empresas pagam R$5 por COMENTÁRIO"<br>
+                            • Subtexto (verde, 24px): "E o cadastro é 100% GRÁTIS"<br>
+                            • Badge inferior: "Saque via PIX • 15.000+ usuários"<br>
+                            • SEM imagem de pessoa — apenas texto forte
+                        </div>
+                    </div>
+
+                    <div class="hook-box">
+                        <div class="hook-label">💬 Copy do Anúncio</div>
+                        <div class="hook-text">
+                            "Empresas estão pagando R$5 por COMENTÁRIO. Sim, aquele comentário que você deixa de graça em site. 🤯<br><br>
+                            A diferença? Agora você pode ser PAGO pra fazer isso. Cadastro gratuito, saque PIX.<br><br>
+                            Link no botão 👇"
+                        </div>
+                    </div>
+                    <div class="specs-row">
+                        <span class="spec-tag">1:1 (Feed)</span>
+                        <span class="spec-tag">Imagem</span>
+                        <span class="spec-tag">Meta + Google</span>
+                        <span class="spec-tag">Alto CTR</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CRIATIVO 10 -->
+            <div class="creative-card">
+                <div class="creative-header">
+                    <span class="creative-number">#10</span>
+                    <span class="badge badge-purple">Viral</span>
+                    <span class="creative-format">🎥 Vídeo 15s</span>
+                </div>
+                <div class="creative-body">
+                    <div class="creative-title">TikTok "3 Passos Grátis" (Ritmo Rápido)</div>
+                    <div class="creative-persona">Formato: Texto na tela + música trending • TikTok/Kwai/Reels</div>
+
+                    <div class="roteiro-box">
+                        <div class="roteiro-label">🎬 Roteiro Completo</div>
+                        <div class="roteiro-text">
+                            <span class="sec">0-2s:</span> [Texto explode na tela] "COMO GANHO R$80/DIA GRÁTIS:" [música hype]<br><br>
+                            <span class="sec">2-5s:</span> [Texto] "1️⃣ Cadastro grátis (2 min)" [mostra tela de cadastro]<br><br>
+                            <span class="sec">5-8s:</span> [Texto] "2️⃣ Comento em blog (3 min)" [mostra digitando]<br><br>
+                            <span class="sec">8-11s:</span> [Texto] "3️⃣ Saque PIX (na hora)" [mostra notificação PIX]<br><br>
+                            <span class="sec">11-15s:</span> [Texto final] "APP GRÁTIS NO LINK DA BIO 👇" [zoom + flash]
+                        </div>
+                    </div>
+
+                    <div class="hook-box">
+                        <div class="hook-label">💬 Copy / Caption</div>
+                        <div class="hook-text">
+                            "App grátis que paga por comentário. R$80/dia. Link na bio 🔗💰 #rendaextra #dinheiroonline #pix #gratis"
+                        </div>
+                    </div>
+                    <div class="specs-row">
+                        <span class="spec-tag">9:16</span>
+                        <span class="spec-tag">15s (viral)</span>
+                        <span class="spec-tag">TikTok/Kwai/Reels</span>
+                        <span class="spec-tag">Orgânico + Pago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BANCO DE COPY EXTRAS -->
+        <div class="section-divider"></div>
+        <h2 class="section-title">📋 Banco de Copy Extra — Headlines & Hooks</h2>
+        <p class="section-subtitle">Copy pronta para usar em anúncios. Copie e cole. Todas reforçam "GRATUITO".</p>
+
+        <div class="copy-bank">
+            <div class="copy-bank-item">
+                <div class="copy-bank-label">HEADLINE 1 — Choque</div>
+                <div class="copy-bank-text">"Eu recebi R$347 na minha conta do Nubank. Tudo que eu fiz: escrevi comentários em blogs. E não paguei NADA pra entrar."</div>
+                <div class="copy-bank-platform">Meta Ads • Facebook • Instagram</div>
+            </div>
+            <div class="copy-bank-item">
+                <div class="copy-bank-label">HEADLINE 2 — Pergunta</div>
+                <div class="copy-bank-text">"Você sabia que existe um app GRATUITO que paga R$3 a R$8 por comentário? Eu testei. Olha meu extrato:"</div>
+                <div class="copy-bank-platform">Meta Ads • Google Ads</div>
+            </div>
+            <div class="copy-bank-item">
+                <div class="copy-bank-label">HEADLINE 3 — Comparação</div>
+                <div class="copy-bank-text">"Pesquisa: R$0,15. Avaliação: R$0,50. Comentário: R$5,00. Adivinhe qual é GRÁTIS e paga mais? 👆"</div>
+                <div class="copy-bank-platform">Meta Ads • TikTok</div>
+            </div>
+            <div class="copy-bank-item">
+                <div class="copy-bank-label">HEADLINE 4 — Desafio</div>
+                <div class="copy-bank-text">"Me diz UM app de renda extra que é GRATUITO, paga via PIX e não te pede nenhum centavo. Eu te mostro."</div>
+                <div class="copy-bank-platform">Meta Ads • TikTok • Orgânico</div>
+            </div>
+            <div class="copy-bank-item">
+                <div class="copy-bank-label">HEADLINE 5 — Específica</div>
+                <div class="copy-bank-text">"47 comentários. 15 minutos cada. R$1.280 no mês. Cadastro: R$0. Investimento: R$0. Risco: zero."</div>
+                <div class="copy-bank-platform">Meta Ads • Google Ads</div>
+            </div>
+            <div class="copy-bank-item">
+                <div class="copy-bank-label">HEADLINE 6 — Emocional (Retargeting)</div>
+                <div class="copy-bank-text">"Você viu esse app ontem mas não se cadastrou. Desde então, 347 pessoas da sua cidade já começaram a ganhar. E é grátis."</div>
+                <div class="copy-bank-platform">Meta Ads (Retargeting)</div>
+            </div>
+        </div>
+
+        <button class="print-btn" onclick="window.print()">🖨️ Imprimir / Salvar como PDF</button>
+    </div>
+</body>
+</html>

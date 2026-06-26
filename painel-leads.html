@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Leads — Comentários Lucrativos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a0e17; --card: #111827; --elevated: #1a2235;
+            --text: #f1f5f9; --muted: #64748b; --border: rgba(255,255,255,0.08);
+            --green: #10b981; --blue: #3b82f6; --purple: #8b5cf6; --gold: #f59e0b; --red: #ef4444;
+            --mono: 'JetBrains Mono', monospace;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
+
+        .header {
+            padding: 32px 0 24px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .header h1 { font-size: 28px; font-weight: 900; display: flex; align-items: center; gap: 10px; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 10px 18px; border-radius: 10px; font-family: 'Inter', sans-serif;
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+            border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-primary { background: var(--green); color: white; border-color: var(--green); }
+        .btn-primary:hover { background: #059669; }
+        .btn-secondary { background: var(--card); color: var(--text); }
+        .btn-secondary:hover { background: var(--elevated); border-color: var(--green); }
+        .btn-danger { background: rgba(239,68,68,0.1); color: var(--red); border-color: rgba(239,68,68,0.3); }
+        .btn-danger:hover { background: rgba(239,68,68,0.2); }
+        .btn-whatsapp { background: #25d366; color: white; border-color: #25d366; }
+        .btn-whatsapp:hover { background: #1da851; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 20px; text-align: center;
+        }
+        .stat-value { font-size: 32px; font-weight: 900; margin-bottom: 2px; }
+        .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+        }
+        .search-box {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 0 14px; flex: 1; max-width: 400px;
+        }
+        .search-box input {
+            background: none; border: none; color: var(--text);
+            font-family: 'Inter', sans-serif; font-size: 14px;
+            padding: 12px 0; outline: none; width: 100%;
+        }
+        .search-box input::placeholder { color: var(--muted); }
+
+        .filter-row { display: flex; gap: 8px; flex-wrap: wrap; }
+        .filter-btn {
+            padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            cursor: pointer; border: 1px solid var(--border); background: var(--card);
+            color: var(--muted); transition: all 0.2s;
+        }
+        .filter-btn:hover, .filter-btn.active { border-color: var(--green); color: var(--green); background: rgba(16,185,129,0.06); }
+
+        .table-wrapper {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 16px; overflow: hidden; margin-bottom: 32px;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: rgba(255,255,255,0.03); }
+        th {
+            text-align: left; padding: 14px 16px; font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted);
+            border-bottom: 1px solid var(--border); white-space: nowrap;
+        }
+        td {
+            padding: 12px 16px; border-bottom: 1px solid var(--border);
+            font-size: 13px; vertical-align: middle;
+        }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        tr.selected td { background: rgba(16,185,129,0.06); }
+
+        .lead-name { font-weight: 600; }
+        .lead-email { color: var(--muted); font-size: 12px; }
+        .lead-phone { font-family: var(--mono); font-size: 12px; }
+        .lead-date { font-size: 12px; color: var(--muted); }
+        .lead-source { font-size: 11px; }
+
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+        .badge-new { background: rgba(16,185,129,0.15); color: var(--green); }
+        .badge-contacted { background: rgba(59,130,246,0.15); color: var(--blue); }
+        .badge-active { background: rgba(139,92,246,0.15); color: var(--purple); }
+        .badge-mobile { background: rgba(245,158,11,0.1); color: var(--gold); }
+        .badge-desktop { background: rgba(100,116,139,0.15); color: var(--muted); }
+
+        .checkbox { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .checkbox.checked { background: var(--green); border-color: var(--green); }
+        .checkbox.checked::after { content: '✓'; color: white; font-size: 11px; font-weight: 700; }
+
+        .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); }
+        .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+        .empty-state h3 { font-size: 18px; color: var(--text); margin-bottom: 8px; }
+        .empty-state p { font-size: 14px; max-width: 400px; margin: 0 auto; }
+
+        .pagination { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+        .pagination-info { font-size: 13px; color: var(--muted); }
+        .pagination-btns { display: flex; gap: 6px; }
+        .pagination-btns button { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text); font-size: 13px; cursor: pointer; }
+        .pagination-btns button.active { background: var(--green); border-color: var(--green); }
+        .pagination-btns button:hover:not(.active) { border-color: var(--green); }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 32px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .modal h3 { font-size: 20px; font-weight: 800; margin-bottom: 16px; }
+        .modal-close { float: right; background: none; border: none; color: var(--muted); font-size: 24px; cursor: pointer; }
+        .whatsapp-list { background: var(--elevated); border-radius: 10px; padding: 16px; font-family: var(--mono); font-size: 13px; line-height: 2; color: #94a3b8; max-height: 300px; overflow-y: auto; user-select: all; }
+        .copy-feedback { display: none; background: var(--green); color: white; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; position: fixed; top: 20px; right: 20px; z-index: 2000; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .webhook-config {
+            background: var(--elevated); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px; margin-bottom: 24px;
+        }
+        .webhook-config h4 { font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--gold); }
+        .webhook-input {
+            width: 100%; padding: 10px 14px; background: var(--card); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text); font-family: var(--mono); font-size: 12px; outline: none;
+        }
+        .webhook-input:focus { border-color: var(--green); }
+        .webhook-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; display: block; }
+        .webhook-row { display: flex; gap: 8px; margin-top: 8px; }
+
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .header { flex-direction: column; align-items: flex-start; }
+            td, th { padding: 8px 10px; font-size: 12px; }
+            .btn { padding: 8px 12px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="copy-feedback" id="copyFeedback">✅ Copiado!</div>
+
+<div class="container">
+    <div class="header">
+        <h1>📋 Painel de Leads</h1>
+        <div class="header-actions">
+            <button class="btn btn-whatsapp" onclick="showWhatsAppModal()">📱 WhatsApp Lista</button>
+            <button class="btn btn-primary" onclick="exportCSV()">📥 Exportar CSV</button>
+            <button class="btn btn-secondary" onclick="showConfigModal()">⚙️ Configurar Webhook</button>
+            <button class="btn btn-danger" onclick="confirmClear()">🗑️ Limpar Tudo</button>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" style="color: var(--green);" id="statTotal">0</div>
+            <div class="stat-label">Total de Leads</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: var(--blue);" id="statToday">0</div>
+            <div class="stat-label">Leads Hoje</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: var(--gold);" id="statMobile">0%</div>
+            <div class="stat-label">Mobile</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: var(--purple);" id="statMeta">0</div>
+            <div class="stat-label">Via Meta Ads</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" style="color: var(--green);" id="statNew">0</div>
+            <div class="stat-label">Novos (não contatados)</div>
+        </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" placeholder="Buscar por nome, email ou WhatsApp..." id="searchInput" oninput="renderTable()">
+        </div>
+        <div class="filter-row">
+            <button class="filter-btn active" onclick="setFilter('all', this)">Todos</button>
+            <button class="filter-btn" onclick="setFilter('novo', this)">Novos</button>
+            <button class="filter-btn" onclick="setFilter('contatado', this)">Contatados</button>
+            <button class="filter-btn" onclick="setFilter('hoje', this)">Hoje</button>
+            <button class="filter-btn" onclick="setFilter('mobile', this)">Mobile</button>
+            <button class="filter-btn" onclick="setFilter('meta', this)">Meta Ads</button>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 40px;"><div class="checkbox" id="selectAll" onclick="toggleSelectAll()"></div></th>
+                    <th>Nome / Email</th>
+                    <th>WhatsApp</th>
+                    <th>Data</th>
+                    <th>Origem</th>
+                    <th>Dispositivo</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="leadsTable"></tbody>
+        </table>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- Modal WhatsApp -->
+<div class="modal-overlay" id="whatsappModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModals()">×</button>
+        <h3>📱 Lista de WhatsApp para Funil</h3>
+        <p style="color: var(--muted); font-size: 13px; margin-bottom: 16px;">
+            Números prontos para importar em ferramentas de automação (Z-API, Evolution API, Make, etc.)
+        </p>
+        <div class="whatsapp-list" id="whatsappList"></div>
+        <div style="display: flex; gap: 8px; margin-top: 16px;">
+            <button class="btn btn-whatsapp" onclick="copyWhatsAppList()">📋 Copiar Lista</button>
+            <button class="btn btn-secondary" onclick="exportWhatsAppCSV()">📥 Exportar CSV WhatsApp</button>
+        </div>
+        <p style="color: var(--muted); font-size: 11px; margin-top: 12px;">
+            Formato: +55 DDD NÚMERO (pronto para APIs de WhatsApp)
+        </p>
+    </div>
+</div>
+
+<!-- Modal Config -->
+<div class="modal-overlay" id="configModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModals()">×</button>
+        <h3>⚙️ Configuração de Integrações</h3>
+
+        <div class="webhook-config">
+            <h4>📊 Webhook (Google Sheets / Zapier / Make)</h4>
+            <p style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">
+                Cole a URL do webhook. Cada novo lead será enviado automaticamente via POST JSON.
+            </p>
+            <label class="webhook-label">URL do Webhook:</label>
+            <div class="webhook-row">
+                <input type="text" class="webhook-input" id="webhookUrlInput" placeholder="https://hooks.zapier.com/hooks/catch/...">
+                <button class="btn btn-primary" onclick="saveWebhookConfig()">Salvar</button>
+            </div>
+        </div>
+
+        <div class="webhook-config">
+            <h4>📱 WhatsApp API</h4>
+            <p style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">
+                Configure para enviar mensagem automática de boas-vindas quando o lead se cadastrar.
+            </p>
+            <label class="webhook-label">URL da API:</label>
+            <input type="text" class="webhook-input" id="waApiInput" placeholder="https://api.z-api.io/instances/..." style="margin-bottom: 8px;">
+            <label class="webhook-label">Token:</label>
+            <div class="webhook-row">
+                <input type="text" class="webhook-input" id="waTokenInput" placeholder="Bearer token...">
+                <button class="btn btn-primary" onclick="saveWhatsAppConfig()">Salvar</button>
+            </div>
+        </div>
+
+        <div class="webhook-config">
+            <h4>🔗 Como conectar com Google Sheets (grátis)</h4>
+            <ol style="font-size: 12px; color: var(--muted); line-height: 2; padding-left: 16px;">
+                <li>Crie uma planilha no Google Sheets</li>
+                <li>Vá em Extensões → Apps Script</li>
+                <li>Cole o código do webhook (disponível na documentação)</li>
+                <li>Publique como "Web App" → Acesso: "Qualquer pessoa"</li>
+                <li>Copie a URL e cole acima</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentFilter = 'all';
+    let currentPage = 1;
+    const PER_PAGE = 25;
+    let selectedLeads = new Set();
+
+    function getLeads() {
+        return JSON.parse(localStorage.getItem('cl_leads') || '[]');
+    }
+
+    function saveLeads(leads) {
+        localStorage.setItem('cl_leads', JSON.stringify(leads));
+    }
+
+    function filterLeads(leads) {
+        const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+        const today = new Date().toISOString().split('T')[0];
+
+        return leads.filter(l => {
+            // Search
+            if (search && !l.nome?.toLowerCase().includes(search) && !l.email?.toLowerCase().includes(search) && !l.whatsapp?.includes(search)) {
+                return false;
+            }
+            // Filters
+            if (currentFilter === 'novo') return l.status === 'novo';
+            if (currentFilter === 'contatado') return l.status === 'contatado';
+            if (currentFilter === 'hoje') return l.data?.startsWith(today);
+            if (currentFilter === 'mobile') return l.dispositivo === 'mobile';
+            if (currentFilter === 'meta') return l.fbclid || l.utm_source?.includes('facebook') || l.utm_source?.includes('meta') || l.utm_source?.includes('ig');
+            return true;
+        });
+    }
+
+    function renderTable() {
+        const allLeads = getLeads();
+        const filtered = filterLeads(allLeads);
+        const totalPages = Math.ceil(filtered.length / PER_PAGE);
+        if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
+        
+        const start = (currentPage - 1) * PER_PAGE;
+        const pageLeads = filtered.slice(start, start + PER_PAGE);
+
+        const tbody = document.getElementById('leadsTable');
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = `
+                <tr><td colspan="8">
+                    <div class="empty-state">
+                        <div class="icon">📭</div>
+                        <h3>Nenhum lead encontrado</h3>
+                        <p>Os leads capturados na página de cadastro aparecerão aqui automaticamente.</p>
+                    </div>
+                </td></tr>`;
+            document.getElementById('pagination').innerHTML = '';
+            updateStats(allLeads);
+            return;
+        }
+
+        tbody.innerHTML = pageLeads.map(l => {
+            const isSelected = selectedLeads.has(l.id);
+            const sourceLabel = getSourceLabel(l);
+            const deviceBadge = l.dispositivo === 'mobile' ? '<span class="badge badge-mobile">📱 Mobile</span>' : '<span class="badge badge-desktop">💻 Desktop</span>';
+            const statusBadge = l.status === 'contatado' ? '<span class="badge badge-contacted">Contatado</span>' : '<span class="badge badge-new">Novo</span>';
+            const cleanPhone = l.whatsapp?.replace(/\D/g, '') || '';
+            const waLink = cleanPhone ? `https://wa.me/55${cleanPhone.replace(/^55/,'')}` : '#';
+
+            return `
+                <tr class="${isSelected ? 'selected' : ''}" data-id="${l.id}">
+                    <td><div class="checkbox ${isSelected ? 'checked' : ''}" onclick="toggleSelect('${l.id}')"></div></td>
+                    <td>
+                        <div class="lead-name">${l.nome || '-'}</div>
+                        <div class="lead-email">${l.email || '-'}</div>
+                    </td>
+                    <td><span class="lead-phone">${l.whatsapp || '-'}</span></td>
+                    <td><span class="lead-date">${l.data_br || new Date(l.data).toLocaleString('pt-BR')}</span></td>
+                    <td><span class="lead-source">${sourceLabel}</span></td>
+                    <td>${deviceBadge}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <a href="${waLink}" target="_blank" class="btn btn-whatsapp" style="padding: 4px 10px; font-size: 11px;">💬</a>
+                        <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="markContacted('${l.id}')">✓</button>
+                    </td>
+                </tr>`;
+        }).join('');
+
+        // Pagination
+        const pagEl = document.getElementById('pagination');
+        pagEl.innerHTML = `
+            <div class="pagination-info">Mostrando ${start + 1}-${Math.min(start + PER_PAGE, filtered.length)} de ${filtered.length} leads</div>
+            <div class="pagination-btns">
+                ${Array.from({length: Math.min(totalPages, 10)}, (_, i) =>
+                    `<button class="${currentPage === i+1 ? 'active' : ''}" onclick="goToPage(${i+1})">${i+1}</button>`
+                ).join('')}
+            </div>`;
+
+        updateStats(allLeads);
+    }
+
+    function getSourceLabel(l) {
+        if (l.fbclid || l.utm_source?.includes('facebook') || l.utm_source?.includes('meta')) return '<span class="badge badge-blue">Meta Ads</span>';
+        if (l.gclid || l.utm_source?.includes('google')) return '<span class="badge badge-gold">Google</span>';
+        if (l.utm_source?.includes('tiktok')) return '<span class="badge badge-purple">TikTok</span>';
+        if (l.utm_source === 'direto' || !l.utm_source) return '<span class="badge" style="background:rgba(255,255,255,0.05);color:var(--muted);">Direto</span>';
+        return `<span class="badge" style="background:rgba(255,255,255,0.05);color:var(--muted);">${l.utm_source}</span>`;
+    }
+
+    function updateStats(leads) {
+        const today = new Date().toISOString().split('T')[0];
+        const todayLeads = leads.filter(l => l.data?.startsWith(today));
+        const mobileLeads = leads.filter(l => l.dispositivo === 'mobile');
+        const metaLeads = leads.filter(l => l.fbclid || l.utm_source?.includes('facebook') || l.utm_source?.includes('meta'));
+        const newLeads = leads.filter(l => l.status === 'novo');
+
+        document.getElementById('statTotal').textContent = leads.length;
+        document.getElementById('statToday').textContent = todayLeads.length;
+        document.getElementById('statMobile').textContent = leads.length ? Math.round((mobileLeads.length / leads.length) * 100) + '%' : '0%';
+        document.getElementById('statMeta').textContent = metaLeads.length;
+        document.getElementById('statNew').textContent = newLeads.length;
+    }
+
+    function setFilter(filter, btn) {
+        currentFilter = filter;
+        currentPage = 1;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderTable();
+    }
+
+    function goToPage(page) { currentPage = page; renderTable(); }
+
+    function toggleSelect(id) {
+        if (selectedLeads.has(id)) selectedLeads.delete(id);
+        else selectedLeads.add(id);
+        renderTable();
+    }
+
+    function toggleSelectAll() {
+        const filtered = filterLeads(getLeads());
+        const allSelected = filtered.every(l => selectedLeads.has(l.id));
+        if (allSelected) {
+            filtered.forEach(l => selectedLeads.delete(l.id));
+        } else {
+            filtered.forEach(l => selectedLeads.add(l.id));
+        }
+        document.getElementById('selectAll').classList.toggle('checked', !allSelected);
+        renderTable();
+    }
+
+    function markContacted(id) {
+        const leads = getLeads();
+        const lead = leads.find(l => l.id === id);
+        if (lead) {
+            lead.status = lead.status === 'contatado' ? 'novo' : 'contatado';
+            saveLeads(leads);
+            renderTable();
+        }
+    }
+
+    // Export CSV
+    function exportCSV() {
+        const leads = getLeads();
+        if (!leads.length) return alert('Nenhum lead para exportar.');
+
+        const headers = ['Nome', 'Email', 'WhatsApp', 'Data', 'Origem', 'Dispositivo', 'UTM Source', 'UTM Medium', 'UTM Campaign', 'Status'];
+        const rows = leads.map(l => [
+            l.nome, l.email, l.whatsapp, l.data_br || l.data,
+            l.utm_source || 'direto', l.dispositivo || '',
+            l.utm_source || '', l.utm_medium || '', l.utm_campaign || '', l.status || 'novo'
+        ]);
+
+        const csv = [headers, ...rows].map(r => r.map(c => `"${(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `leads_comentarios_lucrativos_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+
+        showFeedback('✅ CSV exportado!');
+    }
+
+    // WhatsApp Modal
+    function showWhatsAppModal() {
+        const leads = getLeads();
+        const phones = leads
+            .map(l => l.whatsapp?.replace(/\D/g, ''))
+            .filter(p => p && p.length >= 10)
+            .map(p => p.startsWith('55') ? '+' + p : '+55' + p);
+
+        if (!phones.length) {
+            alert('Nenhum número de WhatsApp encontrado.');
+            return;
+        }
+
+        document.getElementById('whatsappList').textContent = phones.join('\n');
+        document.getElementById('whatsappModal').classList.add('open');
+    }
+
+    function copyWhatsAppList() {
+        const text = document.getElementById('whatsappList').textContent;
+        navigator.clipboard.writeText(text);
+        showFeedback('✅ Lista de WhatsApp copiada!');
+    }
+
+    function exportWhatsAppCSV() {
+        const leads = getLeads();
+        const rows = leads
+            .filter(l => l.whatsapp)
+            .map(l => {
+                const phone = l.whatsapp.replace(/\D/g, '');
+                const fullPhone = phone.startsWith('55') ? phone : '55' + phone;
+                return [l.nome, l.email, '+' + fullPhone, l.data_br || l.data, l.status];
+            });
+
+        const csv = [['Nome', 'Email', 'WhatsApp', 'Data Cadastro', 'Status'], ...rows]
+            .map(r => r.map(c => `"${(c||'').replace(/"/g,'""')}"`).join(','))
+            .join('\n');
+
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `whatsapp_leads_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+
+        showFeedback('✅ CSV WhatsApp exportado!');
+    }
+
+    function showConfigModal() {
+        document.getElementById('configModal').classList.add('open');
+    }
+
+    function closeModals() {
+        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+    }
+
+    function saveWebhookConfig() {
+        const url = document.getElementById('webhookUrlInput').value.trim();
+        localStorage.setItem('cl_webhook_url', url);
+        showFeedback('✅ Webhook salvo!');
+    }
+
+    function saveWhatsAppConfig() {
+        const api = document.getElementById('waApiInput').value.trim();
+        const token = document.getElementById('waTokenInput').value.trim();
+        localStorage.setItem('cl_wa_api', api);
+        localStorage.setItem('cl_wa_token', token);
+        showFeedback('✅ WhatsApp API salva!');
+    }
+
+    function confirmClear() {
+        if (confirm('⚠️ ATENÇÃO: Isso vai apagar TODOS os leads. Tem certeza?\n\nRecomendamos exportar o CSV antes.')) {
+            localStorage.removeItem('cl_leads');
+            localStorage.removeItem('cl_stats');
+            selectedLeads.clear();
+            renderTable();
+            showFeedback('🗑️ Leads apagados.');
+        }
+    }
+
+    function showFeedback(msg) {
+        const el = document.getElementById('copyFeedback');
+        el.textContent = msg;
+        el.style.display = 'block';
+        setTimeout(() => el.style.display = 'none', 2500);
+    }
+
+    // Load saved configs
+    const savedWebhook = localStorage.getItem('cl_webhook_url');
+    if (savedWebhook) document.getElementById('webhookUrlInput').value = savedWebhook;
+    const savedWaApi = localStorage.getItem('cl_wa_api');
+    if (savedWaApi) document.getElementById('waApiInput').value = savedWaApi;
+    const savedWaToken = localStorage.getItem('cl_wa_token');
+    if (savedWaToken) document.getElementById('waTokenInput').value = savedWaToken;
+
+    // Close modals on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(m => {
+        m.addEventListener('click', e => { if (e.target === m) closeModals(); });
+    });
+
+    // Init
+    renderTable();
+</script>
+</body>
+</html>

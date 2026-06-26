@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Lançamento — Comentários Lucrativos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a0e17; --card: #111827; --elevated: #1a2235;
+            --text: #f1f5f9; --muted: #64748b; --border: rgba(255,255,255,0.08);
+            --green: #10b981; --blue: #3b82f6; --purple: #8b5cf6; --gold: #f59e0b; --red: #ef4444;
+            --mono: 'JetBrains Mono', monospace;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        .header { padding: 40px 0 24px; border-bottom: 1px solid var(--border); margin-bottom: 40px; }
+        .header h1 { font-size: 32px; font-weight: 900; margin-bottom: 6px; }
+        .header p { color: var(--muted); font-size: 14px; }
+
+        .tabs { display: flex; gap: 4px; margin-bottom: 32px; background: var(--card); border-radius: 12px; padding: 4px; border: 1px solid var(--border); overflow-x: auto; }
+        .tab { padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; color: var(--muted); }
+        .tab:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+        .tab.active { background: var(--green); color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 32px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; }
+        .card-title { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+
+        .metric-card { text-align: center; padding: 28px 16px; }
+        .metric-value { font-size: 36px; font-weight: 900; margin-bottom: 4px; }
+        .metric-label { font-size: 12px; color: var(--muted); }
+        .metric-sub { font-size: 11px; color: var(--muted); margin-top: 4px; font-family: var(--mono); }
+
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+        .badge-green { background: rgba(16,185,129,0.15); color: var(--green); }
+        .badge-blue { background: rgba(59,130,246,0.15); color: var(--blue); }
+        .badge-gold { background: rgba(245,158,11,0.15); color: var(--gold); }
+        .badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
+        .badge-purple { background: rgba(139,92,246,0.15); color: var(--purple); }
+
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { text-align: left; padding: 12px 14px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); border-bottom: 2px solid var(--border); }
+        td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .section-head { font-size: 20px; font-weight: 800; margin-bottom: 16px; margin-top: 40px; display: flex; align-items: center; gap: 8px; }
+
+        .checklist { list-style: none; }
+        .checklist li { padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; font-size: 14px; }
+        .checklist .check { width: 22px; height: 22px; border: 2px solid var(--border); border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+        .checklist .check.done { background: var(--green); border-color: var(--green); }
+        .checklist .check.done::after { content: '✓'; color: white; font-size: 12px; font-weight: 700; }
+        .checklist li.completed { color: var(--muted); text-decoration: line-through; }
+
+        .audience-card { padding: 20px; }
+        .audience-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+        .audience-desc { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+        .audience-detail { font-size: 12px; line-height: 1.8; color: #94a3b8; }
+
+        .highlight-box { background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(59,130,246,0.04)); border: 1px solid rgba(16,185,129,0.15); border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .highlight-box h4 { font-size: 14px; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+        .highlight-box p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; margin-top: 8px; }
+        .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+
+        .print-btn { display: block; max-width: 250px; margin: 40px auto; padding: 12px 28px; background: var(--card); border: 1px solid var(--border); color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; border-radius: 10px; cursor: pointer; text-align: center; transition: all 0.2s; }
+        .print-btn:hover { border-color: var(--green); }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .tabs { flex-wrap: nowrap; overflow-x: auto; }
+            .header h1 { font-size: 24px; }
+        }
+        @media print { body { background: white; color: black; } .tabs { display: none; } .tab-content { display: block !important; page-break-before: always; } .print-btn { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Dashboard de Lançamento</h1>
+            <p>Estratégia de Segmentação, Unit Economics, Projeções de 90 Dias e Checklist — Comentários Lucrativos</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="showTab(0)">📢 Segmentação</div>
+            <div class="tab" onclick="showTab(1)">💰 Unit Economics</div>
+            <div class="tab" onclick="showTab(2)">📈 Projeção 90 Dias</div>
+            <div class="tab" onclick="showTab(3)">✅ Checklist</div>
+        </div>
+
+        <!-- TAB 1: SEGMENTAÇÃO -->
+        <div class="tab-content active" id="tab0">
+            <h3 class="section-head">📘 Meta Ads — Segmentação Completa</h3>
+
+            <div class="grid-2">
+                <div class="card audience-card" style="border-left: 3px solid var(--blue);">
+                    <div class="audience-name">🎯 Adset 1 — Interesse Amplo (Broad)</div>
+                    <div class="audience-desc"><span class="badge badge-blue">Topo de Funil</span> • Budget: R$60-80/dia</div>
+                    <div class="audience-detail">
+                        <strong>Idade:</strong> 25-55 anos<br>
+                        <strong>Gênero:</strong> Todos<br>
+                        <strong>Localização:</strong> Brasil (todas as regiões)<br>
+                        <strong>Interesses:</strong> Renda extra, trabalho em casa, trabalhar pela internet, PIX, Nubank, PicPay, finanças pessoais<br>
+                        <strong>Dispositivo:</strong> Android predominante<br>
+                        <strong>Objetivo:</strong> Conversão (Lead/Cadastro)<br>
+                        <strong>Criativos:</strong> #01 (Print PIX), #03 (UGC Feminino), #09 (Texto)
+                    </div>
+                </div>
+                <div class="card audience-card" style="border-left: 3px solid var(--purple);">
+                    <div class="audience-name">🎯 Adset 2 — Micro-Tarefas</div>
+                    <div class="audience-desc"><span class="badge badge-purple">Público Específico</span> • Budget: R$40-60/dia</div>
+                    <div class="audience-detail">
+                        <strong>Idade:</strong> 22-50 anos<br>
+                        <strong>Gênero:</strong> Todos<br>
+                        <strong>Interesses:</strong> Opinião remunerada, pesquisa remunerada, app de dinheiro, cashback, renda extra online, freelancer<br>
+                        <strong>Excluir:</strong> Marketing digital, dropshipping (muito sofisticados)<br>
+                        <strong>Objetivo:</strong> Conversão (Lead/Cadastro)<br>
+                        <strong>Criativos:</strong> #07 (Demo App), #04 (UGC Homem), #10 (TikTok rápido)
+                    </div>
+                </div>
+                <div class="card audience-card" style="border-left: 3px solid var(--green);">
+                    <div class="audience-name">🎯 Adset 3 — Lookalike 1-3%</div>
+                    <div class="audience-desc"><span class="badge badge-green">Após 500 leads</span> • Budget: R$60-100/dia</div>
+                    <div class="audience-detail">
+                        <strong>Base:</strong> LAL 1% dos cadastrados (fonte: pixel + lista de emails)<br>
+                        <strong>Expandir para:</strong> LAL 2-3% conforme escala<br>
+                        <strong>Idade:</strong> 23-55 anos<br>
+                        <strong>Criativos:</strong> Top 3 vencedores dos adsets anteriores<br>
+                        <strong>Nota:</strong> Só ativar após 500+ leads para o pixel ter dados suficientes
+                    </div>
+                </div>
+                <div class="card audience-card" style="border-left: 3px solid var(--gold);">
+                    <div class="audience-name">🔄 Adset 4 — Retargeting</div>
+                    <div class="audience-desc"><span class="badge badge-gold">Fundo de Funil</span> • Budget: R$20-40/dia</div>
+                    <div class="audience-detail">
+                        <strong>Público A:</strong> Visitou landing page sem cadastrar (7 dias)<br>
+                        <strong>Público B:</strong> Engajou com IG/FB (14 dias)<br>
+                        <strong>Público C:</strong> Iniciou cadastro sem completar (3 dias)<br>
+                        <strong>Criativos:</strong> #02 (Carrossel), #06 (UGC Aposentada), Copy de urgência<br>
+                        <strong>Frequência máx:</strong> 3x por semana
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="section-head">🎵 TikTok / Kwai — Segmentação</h3>
+            <div class="grid-2">
+                <div class="card audience-card" style="border-left: 3px solid #000;">
+                    <div class="audience-name">🎯 TikTok Pago</div>
+                    <div class="audience-desc"><span class="badge badge-gold">Volume + Baixo CPC</span> • Budget: R$50-500/dia</div>
+                    <div class="audience-detail">
+                        <strong>Idade:</strong> 18-45 anos<br>
+                        <strong>Interesses:</strong> Renda extra, dinheiro online, finanças, trabalho remoto<br>
+                        <strong>Comportamento:</strong> Engajou com vídeos de renda extra<br>
+                        <strong>Criativos:</strong> #05 (UGC Jovem), #10 (3 Passos), #08 (Dia na Vida)<br>
+                        <strong>Formato:</strong> In-Feed + TopView<br>
+                        <strong>CPC alvo:</strong> R$0,10-0,25
+                    </div>
+                </div>
+                <div class="card audience-card" style="border-left: 3px solid var(--green);">
+                    <div class="audience-name">📱 TikTok Orgânico</div>
+                    <div class="audience-desc"><span class="badge badge-green">Custo Zero</span> • 3-5 vídeos/semana</div>
+                    <div class="audience-detail">
+                        <strong>Conteúdo:</strong> Storytime, POV, Tutorial rápido, React a prints<br>
+                        <strong>Hashtags:</strong> #rendaextra #dinheiroonline #pix #comentarioslucrativos #appgratis<br>
+                        <strong>Hora de postar:</strong> 12h, 18h, 21h (pico de audiência)<br>
+                        <strong>Meta:</strong> 1 viral/mês = 1.000+ cadastros grátis<br>
+                        <strong>🔥 Potencial viral alto por ser GRATUITO</strong>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="section-head">🔍 Google Ads — Segmentação</h3>
+            <div class="card" style="margin-bottom: 32px;">
+                <table>
+                    <thead>
+                        <tr><th>Grupo</th><th>Palavra-Chave</th><th>Tipo</th><th>Lance</th><th>Conv. Esperada</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td rowspan="5" style="font-weight: 700; color: var(--blue);">Brand</td><td>comentários lucrativos</td><td>Exata</td><td>R$0,80-1,50</td><td>20-30%</td></tr>
+                        <tr><td>comentarios lucrativos é confiável</td><td>Exata</td><td>R$1,00-2,00</td><td>25-35%</td></tr>
+                        <tr><td>comentarios lucrativos funciona</td><td>Exata</td><td>R$1,00-2,00</td><td>20-30%</td></tr>
+                        <tr><td>comentarios lucrativos é golpe</td><td>Exata</td><td>R$1,50-2,50</td><td>15-25%</td></tr>
+                        <tr><td>comentarios lucrativos é gratuito</td><td>Exata</td><td>R$1,00-2,00</td><td>30-40%</td></tr>
+                        <tr><td rowspan="3" style="font-weight: 700; color: var(--green);">Genérico</td><td>ganhar dinheiro comentando</td><td>Frase</td><td>R$0,60-1,20</td><td>10-20%</td></tr>
+                        <tr><td>app que paga pra comentar grátis</td><td>Frase</td><td>R$0,60-1,50</td><td>15-25%</td></tr>
+                        <tr><td>renda extra grátis 2026</td><td>Frase</td><td>R$0,50-1,00</td><td>8-15%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 2: UNIT ECONOMICS -->
+        <div class="tab-content" id="tab1">
+            <h3 class="section-head">💰 Unit Economics — Modelo Gratuito</h3>
+            <div class="highlight-box">
+                <h4>⚠️ Modelo Diferente: Sem Revenue de Usuário Final</h4>
+                <p>O faturamento vem 100% do B2B (empresas pagam pela plataforma). O objetivo com o usuário é <strong>volume de cadastros + ativações</strong> para gerar comentários orgânicos. A "receita por lead" é indireta — cada comentarista ativo gera valor B2B.</p>
+            </div>
+
+            <div class="grid-4">
+                <div class="card metric-card">
+                    <div class="metric-value" style="color: var(--green);">R$2</div>
+                    <div class="metric-label">CPL Alvo</div>
+                    <div class="metric-sub">Custo por Lead</div>
+                </div>
+                <div class="card metric-card">
+                    <div class="metric-value" style="color: var(--blue);">30%</div>
+                    <div class="metric-label">Taxa Ativação</div>
+                    <div class="metric-sub">1º comentário</div>
+                </div>
+                <div class="card metric-card">
+                    <div class="metric-value" style="color: var(--gold);">R$6,67</div>
+                    <div class="metric-label">CPA Ativo</div>
+                    <div class="metric-sub">CPL ÷ Ativação</div>
+                </div>
+                <div class="card metric-card">
+                    <div class="metric-value" style="color: var(--purple);">15</div>
+                    <div class="metric-label">Comentários/dia</div>
+                    <div class="metric-sub">por usuário ativo</div>
+                </div>
+            </div>
+
+            <h3 class="section-head">📐 Valor por Comentarista Ativo</h3>
+            <div class="card" style="margin-bottom: 32px;">
+                <table>
+                    <thead><tr><th>Métrica</th><th>Valor</th><th>Cálculo</th></tr></thead>
+                    <tbody>
+                        <tr><td>CPL (Custo por Cadastro)</td><td style="color: var(--green); font-weight: 700;">R$ 2,00</td><td>Média entre Meta, TikTok e Google</td></tr>
+                        <tr><td>Taxa de Ativação</td><td style="color: var(--blue); font-weight: 700;">30%</td><td>Cadastrados que fazem 1º comentário</td></tr>
+                        <tr><td>CPA Ativo</td><td style="color: var(--gold); font-weight: 700;">R$ 6,67</td><td>R$2,00 ÷ 0,30</td></tr>
+                        <tr><td>Comentários/dia por ativo</td><td style="font-weight: 700;">15</td><td>Média entre iniciantes e avançados</td></tr>
+                        <tr><td>Comentários/mês por ativo</td><td style="font-weight: 700;">450</td><td>15 × 30 dias</td></tr>
+                        <tr><td>Valor B2B por comentário</td><td style="color: var(--green); font-weight: 700;">R$ 3,50</td><td>Média cobrada das empresas</td></tr>
+                        <tr><td>Receita B2B por ativo/mês</td><td style="color: var(--green); font-weight: 700;">R$ 1.575</td><td>450 × R$3,50</td></tr>
+                        <tr><td>Pagamento ao usuário/mês</td><td style="color: var(--red); font-weight: 700;">R$ 945</td><td>60% do valor B2B</td></tr>
+                        <tr><td>Margem por ativo/mês</td><td style="color: var(--green); font-weight: 700;">R$ 630</td><td>R$1.575 − R$945</td></tr>
+                        <tr><td>Retenção D30</td><td style="font-weight: 700;">25%</td><td>Dos ativados que permanecem ativos</td></tr>
+                        <tr><td>LTV por lead (12 meses)</td><td style="color: var(--green); font-weight: 700;">~R$ 567</td><td>R$630 × 0,30 × 3 meses média</td></tr>
+                        <tr><td><strong>LTV:CAC</strong></td><td style="color: var(--green); font-weight: 700; font-size: 18px;"><strong>85:1</strong></td><td>R$567 ÷ R$6,67 — Excelente</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="section-head">💵 Custos por Canal</h3>
+            <div class="card">
+                <table>
+                    <thead><tr><th>Canal</th><th>CPL</th><th>Budget/Dia</th><th>Leads/Dia</th><th>Ativações/Dia</th><th>Comentários/Dia</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Meta Ads</strong></td><td style="color: var(--green);">R$2,00</td><td>R$200→R$3.000</td><td>100→1.500</td><td>30→450</td><td>450→6.750</td></tr>
+                        <tr><td><strong>TikTok Pago</strong></td><td style="color: var(--green);">R$1,00</td><td>R$50→R$500</td><td>50→500</td><td>15→150</td><td>225→2.250</td></tr>
+                        <tr><td><strong>TikTok Orgânico</strong></td><td style="color: var(--green);">R$0</td><td>R$0</td><td>10→200+</td><td>3→60+</td><td>45→900+</td></tr>
+                        <tr><td><strong>Google Ads</strong></td><td style="color: var(--green);">R$1,20</td><td>R$30→R$150</td><td>25→125</td><td>10→50</td><td>150→750</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 3: PROJEÇÃO 90 DIAS -->
+        <div class="tab-content" id="tab2">
+            <h3 class="section-head">📈 Projeção de Crescimento — 90 Dias</h3>
+
+            <div class="grid-4">
+                <div class="card metric-card"><div class="metric-value" style="color: var(--green);">50K</div><div class="metric-label">Meta: Cadastros</div></div>
+                <div class="card metric-card"><div class="metric-value" style="color: var(--blue);">15K</div><div class="metric-label">Meta: Ativos D30</div></div>
+                <div class="card metric-card"><div class="metric-value" style="color: var(--gold);">200K+</div><div class="metric-label">Meta: Comentários</div></div>
+                <div class="card metric-card"><div class="metric-value" style="color: var(--purple);">500+</div><div class="metric-label">Meta: UGCs</div></div>
+            </div>
+
+            <div class="card" style="margin-bottom: 32px;">
+                <div class="card-title">📊 Evolução Semana a Semana</div>
+                <table>
+                    <thead><tr><th>Período</th><th>Invest./Dia</th><th>CPL</th><th>Cadastros/Dia</th><th>Ativos/Dia</th><th>Coment./Dia</th><th>Acumulado</th></tr></thead>
+                    <tbody>
+                        <tr><td>Semana 1</td><td>R$200</td><td>R$4,00</td><td>50</td><td>15</td><td>225</td><td>350 cadastros</td></tr>
+                        <tr><td>Semana 2</td><td>R$300</td><td>R$3,00</td><td>100</td><td>30</td><td>450</td><td>1.050</td></tr>
+                        <tr><td>Semana 3</td><td>R$500</td><td>R$2,50</td><td>200</td><td>60</td><td>900</td><td>2.450</td></tr>
+                        <tr><td>Semana 4</td><td>R$800</td><td>R$2,00</td><td>400</td><td>120</td><td>1.800</td><td>5.250</td></tr>
+                        <tr style="background: rgba(16,185,129,0.05);"><td><strong>Mês 1 Total</strong></td><td><strong>R$12.600</strong></td><td><strong>R$2,40</strong></td><td colspan="4"><strong>~5.250 cadastros • ~1.575 ativos • ~24.000 comentários</strong></td></tr>
+                        <tr><td>Semana 5-6</td><td>R$1.200</td><td>R$1,80</td><td>667</td><td>200</td><td>3.000</td><td>14.600</td></tr>
+                        <tr><td>Semana 7-8</td><td>R$1.800</td><td>R$1,50</td><td>1.200</td><td>360</td><td>5.400</td><td>31.400</td></tr>
+                        <tr style="background: rgba(59,130,246,0.05);"><td><strong>Mês 2 Total</strong></td><td><strong>R$42.000</strong></td><td><strong>R$1,60</strong></td><td colspan="4"><strong>~26.150 acumulados • ~5.000 ativos • ~75.000 comentários</strong></td></tr>
+                        <tr><td>Semana 9-10</td><td>R$2.500</td><td>R$1,30</td><td>1.920</td><td>576</td><td>8.640</td><td>58.200</td></tr>
+                        <tr><td>Semana 11-12</td><td>R$3.000</td><td>R$1,20</td><td>2.500</td><td>750</td><td>11.250</td><td>93.200</td></tr>
+                        <tr style="background: rgba(245,158,11,0.05);"><td><strong>Mês 3 Total</strong></td><td><strong>R$77.000</strong></td><td><strong>R$1,25</strong></td><td colspan="4"><strong>~62.000 acumulados • ~15.000 ativos • ~200.000+ comentários</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3 class="section-head">💰 Projeção de Receita B2B</h3>
+            <div class="card" style="margin-bottom: 32px;">
+                <table>
+                    <thead><tr><th>Período</th><th>Ativos Acumulados</th><th>Comentários/Mês</th><th>Receita B2B/Mês</th><th>Custos Ads/Mês</th><th>Pagamento Usuários</th><th>Lucro/Mês</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Mês 1</strong></td><td>1.575</td><td>24.000</td><td style="color: var(--green);">R$84.000</td><td>R$12.600</td><td>R$50.400</td><td style="color: var(--green); font-weight: 700;">R$21.000</td></tr>
+                        <tr><td><strong>Mês 2</strong></td><td>5.000</td><td>75.000</td><td style="color: var(--green);">R$262.500</td><td>R$42.000</td><td>R$157.500</td><td style="color: var(--green); font-weight: 700;">R$63.000</td></tr>
+                        <tr><td><strong>Mês 3</strong></td><td>15.000</td><td>200.000+</td><td style="color: var(--green);">R$700.000+</td><td>R$77.000</td><td>R$420.000</td><td style="color: var(--green); font-weight: 700;">R$203.000+</td></tr>
+                    </tbody>
+                </table>
+                <div class="highlight-box" style="margin-top: 16px;">
+                    <h4>⚠️ Premissas</h4>
+                    <p>Valor B2B por comentário: R$3,50 (média). Repasse ao usuário: 60%. Retenção D30: 25%. Validar com dados reais nas primeiras 2 semanas antes de escalar.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: CHECKLIST -->
+        <div class="tab-content" id="tab3">
+            <h3 class="section-head">📋 Pré-Lançamento (Semana -2 a -1)</h3>
+            <div class="card" style="margin-bottom: 24px;">
+                <ul class="checklist" id="checklist-pre">
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Plataforma testada end-to-end: cadastro → missão → comentário → aprovação → saque PIX</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Landing page de cadastro publicada e testada (desktop + mobile)</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Advertorial publicado e linkado à landing page</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Links de cadastro apontando para <a href="https://www.comentarioslucrativos.com/dashboard" style="color: var(--green);">comentarioslucrativos.com/dashboard</a></li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Automação WhatsApp de boas-vindas configurada (mensagem + link 1ª missão)</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Sequência de emails de onboarding (3 emails: boas-vindas, 1ª missão, dicas)</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Meta Pixel instalado — eventos: PageView, Lead (CompleteRegistration)</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Google Tag Manager configurado</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> TikTok Pixel instalado</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Grupo Telegram VIP criado</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> 10+ criativos UGC produzidos (ver criativos-ugc.html)</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> 5+ vídeos orgânicos TikTok gravados</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Disclaimer legal revisado</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Termos de Uso e Política de Privacidade publicadas</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> VSL gravada (opcional — roteiro completo no plano)</li>
+                </ul>
+            </div>
+
+            <h3 class="section-head">🚀 Semana de Lançamento (Semana 1)</h3>
+            <div class="card" style="margin-bottom: 24px;">
+                <ul class="checklist" id="checklist-launch">
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Meta Ads: 3-5 adsets ativados, R$200/dia total, objetivo Lead/Cadastro</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Google Ads: Campanha brand ativada, R$30/dia</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> TikTok: 3-5 vídeos orgânicos publicados</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> TikTok Ads: Campanha ativada, R$50/dia</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Monitorar CPL a cada 6 horas no D1</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Monitorar taxa de ativação (meta: >20% no D1)</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Coletar primeiros prints de saque → novos criativos UGC reais</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Responder WhatsApp/Telegram dos primeiros cadastrados</li>
+                </ul>
+            </div>
+
+            <h3 class="section-head">📈 Pós-Lançamento (Semana 2+)</h3>
+            <div class="card" style="margin-bottom: 24px;">
+                <ul class="checklist" id="checklist-post">
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Kill criativos com CPL > R$4</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Escalar criativos com CPL < R$2 (aumentar budget 20%/dia)</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Produzir novos UGCs com depoimentos REAIS de usuários</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Implementar retargeting: visitou sem cadastrar (7 dias)</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Ativar Lookalike (após 500+ leads)</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Lançar programa de indicação (D7+)</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Publicar 3-5 TikToks orgânicos por semana</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Otimizar onboarding se taxa de ativação < 25%</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Monitorar Reclame Aqui e preparar respostas</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> A/B testar landing page (formulário curto vs. longo)</li>
+                    <li><div class="check" onclick="toggleCheck(this)"></div> Expandir para Kwai Ads (após validar TikTok)</li>
+                </ul>
+            </div>
+        </div>
+
+        <button class="print-btn" onclick="window.print()">🖨️ Imprimir / Salvar como PDF</button>
+    </div>
+
+    <script>
+        function showTab(index) {
+            document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === index));
+            document.querySelectorAll('.tab-content').forEach((c, i) => c.classList.toggle('active', i === index));
+        }
+
+        function toggleCheck(el) {
+            el.classList.toggle('done');
+            el.parentElement.classList.toggle('completed');
+            saveChecklist();
+        }
+
+        function saveChecklist() {
+            const state = {};
+            document.querySelectorAll('.checklist li').forEach((li, i) => {
+                state[i] = li.querySelector('.check').classList.contains('done');
+            });
+            localStorage.setItem('cl_checklist', JSON.stringify(state));
+        }
+
+        function loadChecklist() {
+            const saved = localStorage.getItem('cl_checklist');
+            if (saved) {
+                const state = JSON.parse(saved);
+                document.querySelectorAll('.checklist li').forEach((li, i) => {
+                    if (state[i]) {
+                        li.querySelector('.check').classList.add('done');
+                        li.classList.add('completed');
+                    }
+                });
+            }
+        }
+        loadChecklist();
+    </script>
+</body>
+</html>
